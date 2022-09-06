@@ -14,7 +14,7 @@ renderer.setClearColor(0xD9D2E9)
 
 
 const camera = new THREE.PerspectiveCamera(45, (width) / (height), 0.1, 5000)
-camera.position.set(0, 0, 400)
+camera.position.set(0, 0, 800)
 
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -44,6 +44,11 @@ loader.load(
     },
 )
 
+let plane_ar = []
+let plane_shift = []
+let plane_def = []
+
+
 loader.load(
     './images/plane.obj',
     function (loadPlane) {
@@ -52,17 +57,25 @@ loader.load(
             el.material.side = THREE.DoubleSide
         })
         loadPlane.position.z = 140
-        scene.add(loadPlane)
+
+        for (let i = 0; i < 10; i++) {
+            let newPlane = loadPlane.clone()
+            plane_ar.push(newPlane)
+            plane_shift.push(Math.random() * 0.6)
+            plane_def.push(Math.random() * 20)
+
+            scene.add(newPlane)
+        }
 
     },
 )
 
 const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3( -100, 0, 100 ),
-	new THREE.Vector3( -50, 50, 50 ),
+    new THREE.Vector3( -200, 0, 200 ),
+	new THREE.Vector3( -100, 100, 100 ),
 	new THREE.Vector3( 0, 0, 0 ),
-	new THREE.Vector3( 50, -50, 50 ),
-	new THREE.Vector3( 100, 0, 100 )
+	new THREE.Vector3( 100, -100, 100 ),
+	new THREE.Vector3( 200, 0, 200 )
 ])
 
 const points = curve.getPoints( 50 );
@@ -78,19 +91,32 @@ scene.add(curveObject)
 // scene.add(earth)
 
 let time = 0
+let up = new THREE.Vector3(0, 1, 0)
+let tangent, radians
+let axis = new THREE.Vector3()
+
+
+
+
 const animate = () => {
     time++
     let perc = (time % 200) / 200
-    let nextPerc = ((time * 10) % 200) / 200
-    if (plane) {
-        plane.rotation.z = -1.6
-        let pos = curve.getPoint(perc)
-        plane.position.copy(pos)
-        console.log(nextPerc);
-        debugger
-        plane.lookAt(nextPerc, nextPerc, nextPerc)
+
+    if (plane_ar.length > 0) {
+        plane_ar.forEach((plane, i) => {
+            let custPerc = (plane_shift[i] + perc) % 1
+            let pos = curve.getPoint(custPerc)
+            plane.position.copy(pos.add(new THREE.Vector3(
+                plane_def[i], plane_def[i], plane_def[i]
+            )))
+
+            tangent = curve.getTangent(custPerc).normalize()
+            axis.crossVectors(up, tangent).normalize()
+            radians = Math.acos(up.dot(tangent))
+            plane.quaternion.setFromAxisAngle(axis, radians)
+        })
     }
-    // plane? plane.position.x +=  0.4: ''
+
     earth ? earth.rotation.y += 0.007 : ''
     renderer.render(scene, camera)
     requestAnimationFrame(function () { animate() })
