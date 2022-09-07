@@ -256,7 +256,7 @@
   
     function FigureEightPolynomialKnot( s ) {
   
-      THREE.Curve.call( this );
+      THREE.Curve.call(this);
   
       this.scale = ( s === undefined ) ? 1 : s;
   
