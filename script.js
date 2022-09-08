@@ -40,13 +40,17 @@ loader.load(
     function (object) {
         object.children[0].material = new THREE.MeshNormalMaterial()
         earth.add(object)
-        animate()
     },
 )
 
 let plane_ar = []
 let plane_shift = []
 let plane_def = []
+
+
+let farPlane_ar = []
+let farPlane_ar_shift = []
+let farPlane_ar_def = []
 
 
 loader.load(
@@ -58,7 +62,7 @@ loader.load(
         })
         loadPlane.position.z = 140
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 20; i++) {
             let newPlane = loadPlane.clone()
             plane_ar.push(newPlane)
             plane_shift.push(Math.random() * 0.2)
@@ -67,8 +71,26 @@ loader.load(
             scene.add(newPlane)
         }
 
+        let plus = 0
+        for (let i = 0; i < 40; i++) {
+            let newPlane = loadPlane.clone()
+            farPlane_ar.push(newPlane)
+            farPlane_ar_shift.push(Math.random() * 0.2 + plus)
+            farPlane_ar_def.push(Math.random() * 30 + plus)
+            i > 20? plus = 40: plus
+            scene.add(newPlane)
+
+        }
+
+        animate()
+
     },
 )
+
+
+
+
+
 
 const curve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-200, -140, 0),
@@ -108,15 +130,26 @@ const curve = new THREE.CatmullRomCurve3([
 
 ])
 
-const points = curve.getPoints(50);
-const geometry = new THREE.BufferGeometry().setFromPoints(points);
+const dotsArray = [
+    new THREE.Vector3(-200, 20, 0),
+    new THREE.Vector3(-190, 50, 0),
+    new THREE.Vector3(-100, 0, 0)
+]
 
-const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+for (let i = 0; i < 20; i++) {
+    dotsArray.push(new THREE.Vector3(i * 80, Math.sin(i) * (Math.random() * 100) * 10, -800 * Math.random()))
+}
+
+const farPlaneCurve = new THREE.CatmullRomCurve3(dotsArray)
+const farPoints = farPlaneCurve.getPoints(50)
+const any = new THREE.BufferGeometry().setFromPoints(farPoints)
+const newMaterial = new THREE.LineBasicMaterial({color: 0xff0000})
+const newObject = new THREE.Line(any, newMaterial)
+newObject.position.x = -620
 
 // Create the final object to add to the scene
-// const curveObject = new THREE.Line( geometry, material )
 
-// scene.add(curveObject)
 
 scene.add(earth)
 
@@ -127,7 +160,7 @@ let axis = new THREE.Vector3()
 
 
 
-let some = 'center'
+let cameraPosition = 'center'
 const animate = () => {
     time++
 
@@ -146,34 +179,52 @@ const animate = () => {
         })
     }
 
-    if (some === 'center') {
+    if (farPlane_ar.length > 0) {
+        let up = new THREE.Vector3(0, -1, 1)
+        farPlane_ar.forEach((plane, i) => {
+            let custPerc = (farPlane_ar_shift[i] + time / 2000) % 1
+            let pos = farPlaneCurve.getPoint(custPerc)
+            plane.position.copy(pos)
+            plane.position.x -= 620
+            plane.position.z += 200
+
+            tangent = curve.getTangent(custPerc).normalize()
+            axis.crossVectors(up, tangent).normalize()
+            radians = Math.acos(up.dot(tangent))
+            plane.quaternion.setFromAxisAngle(axis, radians)
+        } )
+    }
+
+
+
+    if (cameraPosition === 'center') {
 
         if (camera.position.z > 450) {
-            setTimeout(() => some = 'center-left', 7000)
+            setTimeout(() => cameraPosition = 'center-left', 7000)
         } else {
             camera.position.z += 0.5
             camera.position.y -= 0.18 
         }
-    } else if (some === 'center-left') {
+    } else if (cameraPosition === 'center-left') {
        
         if (Math.floor(camera.position.x ) === 90) {
-            setTimeout(() => some = 'left-center', 3000)
+            setTimeout(() => cameraPosition = 'left-center', 3000)
         } else {
             camera.position.z -=0.5
             camera.position.y += 0.18
             camera.position.x +=0.2
         }
-    } else if (some === 'left-center') {
+    } else if (cameraPosition === 'left-center') {
         if (Math.floor(camera.position.x) === 1) {
-            setTimeout(() => some = 'center-center', 3000)
+            setTimeout(() => cameraPosition = 'center-center', 3000)
         } else {
             camera.position.z += 0.5
             camera.position.y -= 0.18
             camera.position.x -= 0.2
         }
-    } else if (some === 'center-center') {
+    } else if (cameraPosition === 'center-center') {
         if (Math.floor(camera.position.z) === 180) {
-            setTimeout(() => some = 'center', 5000)
+            setTimeout(() => cameraPosition = 'center', 5000)
         } else {
             camera.position.z -= 0.5
             camera.position.y += 0.18
