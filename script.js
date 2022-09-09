@@ -1,4 +1,5 @@
 import { OBJLoader } from "./OBJLoader.js"
+import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.144.0/three.module.js'
 const width = window.innerWidth
 const height = window.innerHeight
 
@@ -138,7 +139,7 @@ const dotsArray = [
 
 
 for (let i = 0; i < 20; i++) {
-    dotsArray.push(new THREE.Vector3(i * 80, Math.sin(i) * (Math.random() * 100) * 10, -800 * Math.random()))
+    dotsArray.push(new THREE.Vector3(i * 80, ))
 }
 
 const farPlaneCurve = new THREE.CatmullRomCurve3(dotsArray)
