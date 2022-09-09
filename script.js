@@ -1,4 +1,4 @@
-import { OBJLoader } from "https://raw.githubusercontent.com/Irnyashkaaa/planes/master/dist/OBJLoader.js"
+import { OBJLoader } from "./OBJLoader.js"
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.144.0/three.module.js'
 const width = window.innerWidth
 const height = window.innerHeight
@@ -139,16 +139,10 @@ const dotsArray = [
 
 
 for (let i = 0; i < 20; i++) {
-    dotsArray.push(new THREE.Vector3(i * 80, ))
+    dotsArray.push(new THREE.Vector3(i * 80, Math.sin(i) * 70 * Math.random() * 10, -599))
 }
 
 const farPlaneCurve = new THREE.CatmullRomCurve3(dotsArray)
-const farPoints = farPlaneCurve.getPoints(50)
-const any = new THREE.BufferGeometry().setFromPoints(farPoints)
-const newMaterial = new THREE.LineBasicMaterial({color: 0xff0000})
-const newObject = new THREE.Line(any, newMaterial)
-newObject.position.x = -620
-
 // Create the final object to add to the scene
 
 
