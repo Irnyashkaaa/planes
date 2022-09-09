@@ -1,4 +1,4 @@
-import { OBJLoader } from "./OBJLoader.js"
+import { OBJLoader } from "https://irnyashkaaa.github.io/planes/OBJLoader.js"
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.144.0/three.module.js'
 const width = window.innerWidth
 const height = window.innerHeight
