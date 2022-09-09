@@ -13,7 +13,7 @@ import {
 	PointsMaterial,
 	Vector3,
 	Color
-} from '../node_modules/three/build/three.module.js';
+} from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.144.0/three.module.js';
 
 // o object_name | g group_name
 const _object_pattern = /^[og]\s*(.+)?/;
